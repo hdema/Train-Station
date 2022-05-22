@@ -1,0 +1,377 @@
+create database Train_Station;
+use Train_Station;
+
+CREATE TABLE train_Station.Train_Classification
+(
+  ID INT NOT NULL AUTO_INCREMENT,
+  Classification VARCHAR(20) NOT NULL,
+  increase__rate FLOAT NOT NULL,
+  PRIMARY KEY (ID),
+  UNIQUE (Classification)
+);
+
+CREATE TABLE train_Station.Train
+(
+  ID INT NOT NULL AUTO_INCREMENT,
+  Code VARCHAR(20) NOT NULL,
+  number_Of_Seats INT NOT NULL,
+  ClassID INT NOT NULL,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (ClassID) REFERENCES Train_Classification(ID),
+  UNIQUE (Code)
+);
+
+CREATE TABLE train_Station.Trip
+(
+  ID INT NOT NULL AUTO_INCREMENT,
+  Cost FLOAT NOT NULL,
+  Departure_City VARCHAR(20) NOT NULL,
+  Destination_City VARCHAR(20) NOT NULL,
+  Departure_Time time NOT NULL,
+  Arrival_Time time NOT NULL,
+  Date_ DATE NOT NULL,
+  PRIMARY KEY (ID)
+);
+
+CREATE TABLE train_Station.Passenger
+(
+  ID INT NOT NULL AUTO_INCREMENT,
+  First_Name VARCHAR(20) NOT NULL,
+  Middle_Name VARCHAR(20) NOT NULL,
+  Last_Name VARCHAR(20) NOT NULL,
+  DOB DATE NOT NULL,
+  National_Number VARCHAR(20) NOT NULL,
+  PRIMARY KEY (ID),
+  UNIQUE (National_Number)
+);
+
+CREATE TABLE train_Station.Driver
+(
+  ID INT NOT NULL AUTO_INCREMENT,
+  First_Name VARCHAR(20) NOT NULL,
+  Middle_Name VARCHAR(20) NOT NULL,
+  Last_Name VARCHAR(20) NOT NULL,
+  DOB DATE NOT NULL,
+  Salary FLOAT NOT NULL,
+  PRIMARY KEY (ID)
+);
+
+CREATE TABLE  train_Station.User_Role
+(
+  ID INT NOT NULL AUTO_INCREMENT,
+  Role VARCHAR(20) NOT NULL,
+  PRIMARY KEY (ID),
+  UNIQUE (Role)
+);
+
+CREATE TABLE train_Station.User
+(
+  ID INT NOT NULL AUTO_INCREMENT,
+  Email VARCHAR(50) unique NOT NULL,
+  password VARCHAR(50) NOT NULL,
+  RoleID INT NOT NULL,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (RoleID) REFERENCES User_Role(ID)
+);
+
+CREATE TABLE train_Station.Report
+(
+  ID INT NOT NULL AUTO_INCREMENT,
+  Date_ DATE NOT NULL,
+  details Text NOT NULL,
+  UserID INT NOT NULL,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (UserID) REFERENCES User(ID)
+  );
+  
+  CREATE TABLE train_Station.Trip_Train
+(
+  ID INT NOT NULL AUTO_INCREMENT,
+  TrainID INT NOT NULL,
+  TripID INT NOT NULL,
+  DriveID INT NOT NULL,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (TrainID) REFERENCES Train(ID),
+  FOREIGN KEY (TripID) REFERENCES Trip(ID),
+  FOREIGN KEY (DriveID) REFERENCES Driver(ID)
+);
+
+CREATE TABLE train_Station.Ticket
+(
+  ID INT NOT NULL AUTO_INCREMENT,
+  Date_ DATE NOT NULL,
+  seat_Number INT NOT NULL,
+  Trip_trainID INT NOT NULL,
+  PassengerID INT NOT NULL,
+  UserID INT NOT NULL,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (Trip_trainID) REFERENCES Trip_train(ID),
+  FOREIGN KEY (PassengerID) REFERENCES Passenger(ID),
+  FOREIGN KEY (UserID) REFERENCES User(ID)
+);
+
+INSERT INTO train_Station.User_Role
+(ID,Role)
+VALUES
+(1,'admin'),
+(2,'user'),
+(3,'employee');
+
+INSERT INTO train_Station.User
+(email,password,RoleID)
+VALUES
+('user@gmail.com','12345',2),
+('user2@gmail.com','0000',2),
+('user3@gmail.com','pass',2),
+('admin@gmail.com','admin',1),
+('admin2@gmail.com','pAd',1),
+('admin3@gmail.com','09876',1),
+('admin4@gmail.com','emp012',3);
+
+INSERT INTO train_Station.Driver
+(First_Name,Middle_Name,Last_Name,DOB,Salary)
+VALUES
+('Mhd','Salem',	'Malek','1993-04-22',20000),
+('Mahmood','Ayman','Ragheeb','1987-03-01',15000);
+
+INSERT INTO train_Station.Train_Classification
+( Classification, increase__rate)
+VALUES
+('VIP',50),
+('Normal',0),
+('Fast',60);
+
+INSERT INTO train_Station.train
+( Code, number_Of_Seats, ClassID)
+VALUES
+('N_T1',40,2),
+('N_T2',50,2),
+('VT001',40,1),
+('F-01',40,3);
+
+INSERT INTO train_Station.Trip
+(Cost, Departure_City, Destination_City, Departure_Time, Arrival_Time, Date_)
+VALUES
+(50,'Riyadh	','Madina','12:30:00','12:50:00','2022-04-30'),
+(25,'Riyadh','Madina','12:40:00','02:00:00','2022-04-30'),
+(75,'Mecca','Riyadh','01:00:00','02:00:00','2022-05-02');
+ 
+
+INSERT INTO train_Station.Trip_Train
+(TrainID ,TripID,DriveID)
+VALUES
+(4, 1 , 2),
+(1, 2 , 2),
+(3, 3 , 1); 
+ 
+INSERT INTO train_Station.Passenger
+(First_Name,Middle_Name,Last_Name,DOB,National_Number)
+VALUES
+('Ali',	'Saleem',	'Hasan',	'1999-04-01',	'123456789'),
+('Fouad', 'Ali',	'Hasan',	'2014-07-23',	'0987345'),
+('Lilas',	'Emad',	'Kamel',	'2001-07-06', '753356874');
+
+INSERT INTO train_Station.Ticket
+(Date_, seat_Number, Trip_trainID, PassengerID, UserID)
+VALUES
+('2022-04-17',	1,	1,	3,	1),
+('2022-04-17',	2,	2,	3,	1),
+('2022-04-17',	1,	3,	1,	1);
+ 
+INSERT INTO train_Station.report
+(Date_, details, UserID)
+VALUES
+('2022-04-17',	'some probleme -_-',	1),
+('2022-04-17',	'I have a probleme -------',	2);
+
+select * from train_Station.Train_Classification;
+select * from train_Station.Train;
+select * from train_Station.Trip;
+select * from train_Station.Passenger;
+select * from train_Station.Driver;
+select * from train_Station.User_Role;
+select * from train_Station.User;
+select * from train_Station.Report;
+select * from train_Station.Trip_Train;
+select * from train_Station.Ticket;
+
+/*1-	Total number of user in the system and their roles:*/
+SELECT 
+    COUNT(user.id) AS 'total number of users',
+    user_role.role AS 'role'
+FROM
+    user,
+    user_role
+WHERE
+    user.RoleID = user_role.ID
+GROUP BY role;
+
+/*2-	Passenger with the type of age*/
+SELECT 
+    *,
+    CASE
+        WHEN dob > '2004-01-01' THEN 'children'
+        WHEN dob < '2004-01-01' THEN 'adult'
+    END AS TypeOfAge
+FROM
+    passenger;
+    
+/*3-	Email of users with id of passengers who user has created booking for him/her*/
+SELECT 
+    ticket.PassengerID, user.email
+FROM
+    user
+        JOIN
+    ticket ON ticket.userid = user.id
+HAVING ticket.passengerID IS NOT NULL;
+
+update train_station.train set number_Of_Seats = 25 where ClassID = 1;
+
+/*4-	Information of trains which have number of seats between 20 and 40*/
+SELECT 
+    *
+FROM
+    train,
+    train_classification
+WHERE
+    classID = train_classification.id
+        AND number_of_seats BETWEEN 25 AND 40;
+        
+/*5-	Details of report and their date which have been reported by admins or employee*/
+SELECT 
+    report.details, report.date_
+FROM
+    report,
+    user,
+    user_role
+WHERE
+    report.userID = user.id
+        AND user.roleID = user_role.id
+        AND user_role.role IN ('admin' , 'employee');
+        
+/*6*/
+	SELECT 
+    tripID, driveID
+FROM
+    trip_train
+WHERE
+    driveID = ANY (SELECT 
+            id
+        FROM
+            driver
+        WHERE
+            DOB > '1990-01-01');
+
+/*7-	select trips information order by their dates*/
+SELECT 
+    trip_train.id,
+    trip.Cost,
+    trip.Departure_City,
+    trip.Destination_City,
+    trip.Departure_Time,
+    trip.Arrival_Time,
+    trip.Date_,
+    train.code,
+    Train_Classification.Classification
+FROM
+    train,
+    trip,
+    trip_train,
+    Train_Classification
+WHERE
+    trip_train.TrainID = train.id
+        AND train.ClassID = Train_Classification.id
+        AND trip_train.TripID = trip.id
+ORDER BY trip.date_ DESC , trip.id DESC;
+
+/*8-	names of all of drivers and passengers*/
+SELECT 
+    'Driver' AS Type, First_name, Middle_name, last_name
+FROM
+    Driver 
+UNION SELECT 
+    'Passenger', First_name, Middle_name, last_name
+FROM
+    Passenger;
+
+/*9-	classification of existed trains*/
+SELECT DISTINCT
+    train_classification.Classification
+FROM
+    train,
+    train_classification
+WHERE
+    train_classification.id = train.classid;
+    
+/*10-	number of seat of a train by its code(using procedure):*/
+DELIMITER $$
+CREATE PROCEDURE get_number_Of_Seats(IN Code varchar(20))
+BEGIN
+	select number_Of_Seats from train where train.code =  code ;
+    END$$
+DELIMITER ;
+
+/*11-	get id of driver by its name (using function)*/
+DELIMITER $$
+CREATE FUNCTION get_id_of_driver(F_name VARCHAR(20),M_name VARCHAR(20),L_name VARCHAR(20)) RETURNS INT
+deterministic
+ BEGIN
+	 DECLARE idDriver INT;
+SELECT 
+    id
+INTO idDriver FROM
+    Driver
+WHERE
+    First_Name = F_name
+        AND Middle_Name = m_name
+        AND Last_Name = l_name;
+           RETURN idDriver;
+    END$$
+DELIMITER ;
+
+/*12-	trigger:*/
+DELIMITER //  
+ Create Trigger before_insert_driver
+BEFORE INSERT ON driver  FOR EACH ROW  
+BEGIN  
+IF NEW.salary < 0 THEN SET NEW.salary = 0;  
+END IF;  
+END //  
+
+/*13-	update password of user (using procedure):*/
+DELIMITER $$
+CREATE PROCEDURE update_password(IN id int, password varchar(20))
+BEGIN
+	UPDATE user 
+SET 
+    user.password = password
+WHERE
+    user.id = id;
+    END$$
+DELIMITER ;
+
+/*14*/
+delete from Ticket where id = 10;
+
+/*15-	insert passenger:*/
+INSERT INTO Passenger (First_Name ,Middle_Name ,  Last_Name , DOB , national_number)
+ VALUES('Mohammed','Ahmed','Alsalem','2000-04-10',101);
+ 
+/*16*/
+SELECT First_Name FROM Passenger UNION SELECT First_Name FROM driver;
+
+/*17*/
+SELECT * FROM Passenger WHERE Last_Name LIKE 'H%';
+
+/*18*/
+CREATE INDEX indx ON train_Station.Trip(Departure_City, Destination_City);
+
+/*19*/
+SELECT * FROM train_Station.Trip WHERE NOT Arrival_Time='02:00:00';
+
+ /*20*/
+CREATE ASSERTION passenger_tickets 
+CHECK  
+(NOT EXISTS
+ 
+ (SELECT *  FROM passenger p INNER JOIN ticket t ON p.ID = t.PassengerID );
